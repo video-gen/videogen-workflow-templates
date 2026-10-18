@@ -60,3 +60,7 @@ SCOUT_N8N_RUNTIME="$PWD" npm test
 ```
 
 The fixture test suite starts a local HTTP server and uses synthetic authentication. It makes no paid VideoGen generation calls.
+
+## Sample output
+
+[Download the 9.6-second onboarding sample](examples/onboarding-sample.mp4). This is a separate live-service smoke test using AI illustrations, captions, and transitions. It is not the output of a live authenticated n8n execution or of the stock-visual recipe.
