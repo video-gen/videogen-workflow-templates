@@ -5,3 +5,5 @@ test-user/
 .env
 .env.*
 __pycache__/
+
+evidence/

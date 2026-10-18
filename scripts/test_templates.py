@@ -10,10 +10,11 @@ import time
 import uuid
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
-RUNTIME = pathlib.Path(os.environ.get('SCOUT_N8N_RUNTIME', '/private/tmp/videogen-scout-runtime'))
+RUNTIME = pathlib.Path(os.environ.get('SCOUT_N8N_RUNTIME', str(ROOT)))
 BIN = str(RUNTIME / 'node_modules/.bin/n8n')
 WORK = RUNTIME / 'fixture-tests'
 WORK.mkdir(exist_ok=True)
+(ROOT / 'evidence').mkdir(exist_ok=True)
 EVENTS = []
 
 class Handler(http.server.BaseHTTPRequestHandler):
