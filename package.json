@@ -1,0 +1,12 @@
+{
+  "name": "videogen-workflow-templates",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Core-node n8n workflow recipes for VideoGen",
+  "scripts": {
+    "test": "python3 scripts/test_templates.py"
+  },
+  "devDependencies": {
+    "n8n": "2.43.7"
+  }
+}

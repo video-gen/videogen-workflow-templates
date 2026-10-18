@@ -1,0 +1,285 @@
+{
+  "runtime": "n8n 2.43.7",
+  "scope": "Actual n8n imports and executions against local synthetic HTTP API fixtures; no live VideoGen key used.",
+  "results": [
+    {
+      "template": "approved-script-to-narrated-video.json",
+      "scenario": "success",
+      "passed": true,
+      "exitCode": 0,
+      "postCount": 1,
+      "downloadCount": 1,
+      "requestBodies": [
+        {
+          "script": "Welcome to the new team workspace. Open the project library, choose a template, and review your first draft before sharing it.",
+          "visualStyle": {
+            "type": "STOCK"
+          },
+          "aspectRatio": {
+            "width": 16,
+            "height": 9
+          },
+          "language": "en",
+          "autoExport": true,
+          "remixActions": [
+            {
+              "type": "ENABLE_CAPTIONS"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "template": "training-deck-to-narrated-video.json",
+      "scenario": "success",
+      "passed": true,
+      "exitCode": 0,
+      "postCount": 1,
+      "downloadCount": 1,
+      "requestBodies": [
+        {
+          "fileId": "vg_file_fixture",
+          "slideScripts": [
+            "Welcome to your first day. This lesson introduces the workspace.",
+            "Open the project library and choose a template to begin."
+          ],
+          "aspectRatio": {
+            "width": 16,
+            "height": 9
+          },
+          "language": "en",
+          "autoExport": true
+        }
+      ]
+    },
+    {
+      "template": "voiceover-to-captioned-video.json",
+      "scenario": "success",
+      "passed": true,
+      "exitCode": 0,
+      "postCount": 1,
+      "downloadCount": 1,
+      "requestBodies": [
+        {
+          "fileId": "vg_file_fixture",
+          "visualStyle": {
+            "type": "STOCK"
+          },
+          "aspectRatio": {
+            "width": 16,
+            "height": 9
+          },
+          "language": "en",
+          "autoExport": true
+        }
+      ]
+    },
+    {
+      "template": "approved-script-to-narrated-video.json",
+      "scenario": "poll",
+      "passed": true,
+      "exitCode": 0,
+      "postCount": 1,
+      "downloadCount": 1,
+      "requestBodies": [
+        {
+          "script": "Welcome to the new team workspace. Open the project library, choose a template, and review your first draft before sharing it.",
+          "visualStyle": {
+            "type": "STOCK"
+          },
+          "aspectRatio": {
+            "width": 16,
+            "height": 9
+          },
+          "language": "en",
+          "autoExport": true,
+          "remixActions": [
+            {
+              "type": "ENABLE_CAPTIONS"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "template": "approved-script-to-narrated-video.json",
+      "scenario": "failure",
+      "passed": true,
+      "exitCode": 1,
+      "postCount": 1,
+      "downloadCount": 0,
+      "requestBodies": [
+        {
+          "script": "Welcome to the new team workspace. Open the project library, choose a template, and review your first draft before sharing it.",
+          "visualStyle": {
+            "type": "STOCK"
+          },
+          "aspectRatio": {
+            "width": 16,
+            "height": 9
+          },
+          "language": "en",
+          "autoExport": true,
+          "remixActions": [
+            {
+              "type": "ENABLE_CAPTIONS"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "template": "approved-script-to-narrated-video.json",
+      "scenario": "cancelled",
+      "passed": true,
+      "exitCode": 1,
+      "postCount": 1,
+      "downloadCount": 0,
+      "requestBodies": [
+        {
+          "script": "Welcome to the new team workspace. Open the project library, choose a template, and review your first draft before sharing it.",
+          "visualStyle": {
+            "type": "STOCK"
+          },
+          "aspectRatio": {
+            "width": 16,
+            "height": 9
+          },
+          "language": "en",
+          "autoExport": true,
+          "remixActions": [
+            {
+              "type": "ENABLE_CAPTIONS"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "template": "approved-script-to-narrated-video.json",
+      "scenario": "unknown",
+      "passed": true,
+      "exitCode": 1,
+      "postCount": 1,
+      "downloadCount": 0,
+      "requestBodies": [
+        {
+          "script": "Welcome to the new team workspace. Open the project library, choose a template, and review your first draft before sharing it.",
+          "visualStyle": {
+            "type": "STOCK"
+          },
+          "aspectRatio": {
+            "width": 16,
+            "height": 9
+          },
+          "language": "en",
+          "autoExport": true,
+          "remixActions": [
+            {
+              "type": "ENABLE_CAPTIONS"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "template": "approved-script-to-narrated-video.json",
+      "scenario": "timeout",
+      "passed": true,
+      "exitCode": 1,
+      "postCount": 1,
+      "downloadCount": 0,
+      "requestBodies": [
+        {
+          "script": "Welcome to the new team workspace. Open the project library, choose a template, and review your first draft before sharing it.",
+          "visualStyle": {
+            "type": "STOCK"
+          },
+          "aspectRatio": {
+            "width": 16,
+            "height": 9
+          },
+          "language": "en",
+          "autoExport": true,
+          "remixActions": [
+            {
+              "type": "ENABLE_CAPTIONS"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "template": "approved-script-to-narrated-video.json",
+      "scenario": "wrongid",
+      "passed": true,
+      "exitCode": 1,
+      "postCount": 1,
+      "downloadCount": 0,
+      "requestBodies": [
+        {
+          "script": "Welcome to the new team workspace. Open the project library, choose a template, and review your first draft before sharing it.",
+          "visualStyle": {
+            "type": "STOCK"
+          },
+          "aspectRatio": {
+            "width": 16,
+            "height": 9
+          },
+          "language": "en",
+          "autoExport": true,
+          "remixActions": [
+            {
+              "type": "ENABLE_CAPTIONS"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "template": "approved-script-to-narrated-video.json",
+      "scenario": "missingurl",
+      "passed": true,
+      "exitCode": 1,
+      "postCount": 1,
+      "downloadCount": 0,
+      "requestBodies": [
+        {
+          "script": "Welcome to the new team workspace. Open the project library, choose a template, and review your first draft before sharing it.",
+          "visualStyle": {
+            "type": "STOCK"
+          },
+          "aspectRatio": {
+            "width": 16,
+            "height": 9
+          },
+          "language": "en",
+          "autoExport": true,
+          "remixActions": [
+            {
+              "type": "ENABLE_CAPTIONS"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "template": "approved-script-to-narrated-video.json",
+      "scenario": "unapproved",
+      "passed": true,
+      "exitCode": 1,
+      "postCount": 0,
+      "downloadCount": 0,
+      "requestBodies": []
+    },
+    {
+      "template": "approved-script-to-narrated-video.json",
+      "scenario": "invalidinput",
+      "passed": true,
+      "exitCode": 1,
+      "postCount": 0,
+      "downloadCount": 0,
+      "requestBodies": []
+    }
+  ]
+}

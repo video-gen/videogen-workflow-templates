@@ -1,0 +1,302 @@
+{
+  "name": "Convert an approved training deck to a narrated video with VideoGen",
+  "nodes": [
+    {
+      "id": "4ebb381f-f7c0-546d-a009-bc7c89865c4e",
+      "name": "When clicking Execute workflow",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "21f6b661-8de3-5450-8001-32f6c75e4ff1",
+      "name": "Approved input",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        240,
+        300
+      ],
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"approved\": false,\n  \"fileId\": \"REPLACE_WITH_UPLOADED_VIDEOGEN_FILE_ID\",\n  \"slideScripts\": [\n    \"Welcome to your first day. This lesson introduces the workspace.\",\n    \"Open the project library and choose a template to begin.\"\n  ],\n  \"language\": \"en\"\n}",
+        "options": {}
+      }
+    },
+    {
+      "id": "cc234580-462a-5943-9863-52cf3515d984",
+      "name": "Prepare request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        300
+      ],
+      "parameters": {
+        "jsCode": "\nconst source = $input.first().json;\nif (source.approved !== true) throw new Error('Set approved to true after reviewing the input. No generation was started.');\nif (typeof source.fileId !== 'string' || !/^vg_file_[A-Za-z0-9_-]+$/.test(source.fileId)) throw new Error('Provide a processed VideoGen file ID for an uploaded PDF or PowerPoint.');\nif (source.slideScripts !== undefined && (!Array.isArray(source.slideScripts) || !source.slideScripts.every(s => typeof s === 'string'))) throw new Error('slideScripts must be an array of narration strings.');\nconst request = {fileId:source.fileId, ...(source.slideScripts !== undefined ? {slideScripts:source.slideScripts} : {}), aspectRatio:{width:16,height:9}, language:source.language || 'en', autoExport:true};\nreturn [{json: {request, pollDeadline: Date.now() + 15 * 60 * 1000}}];\n"
+      }
+    },
+    {
+      "id": "a1faf62d-ff53-510d-84c8-ea07a4f28cae",
+      "name": "Start VideoGen workflow",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        720,
+        300
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.videogen.io/v1/workflows/slideshow-to-video",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.request }}",
+        "options": {
+          "timeout": 60000,
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "notes": "Select an HTTP Header Auth credential: Name Authorization; Value Bearer followed by your VideoGen API key. No automatic retry: a lost POST response may still have started a paid generation. Inspect runs before retrying."
+    },
+    {
+      "id": "ecaa973f-c67b-5c7d-8356-8c267b68936f",
+      "name": "Get VideoGen run",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        960,
+        300
+      ],
+      "parameters": {
+        "url": "={{ 'https://api.videogen.io/v1/workflows/runs/' + $('Start VideoGen workflow').first().json.workflowRunId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 60000,
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000
+    },
+    {
+      "id": "90360ab2-5f7b-5856-a774-7d84534eb825",
+      "name": "Check completion",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1200,
+        300
+      ],
+      "parameters": {
+        "jsCode": "\nconst run = $input.first().json;\nconst expected = $('Start VideoGen workflow').first().json.workflowRunId;\nif (typeof expected !== 'string' || !expected.startsWith('vg_work_')) throw new Error('Missing workflow run ID. Inspect the start execution before rerunning; a paid job may already exist.');\nif (run.workflowRunId !== expected) throw new Error('Unexpected workflow run ID. Stopping without downloading.');\nif (!['pending','running','succeeded','failed','cancelled'].includes(run.status)) throw new Error('Unexpected workflow status. Inspect the saved run ID before rerunning.');\nif (run.status === 'failed' || run.status === 'cancelled') throw new Error('VideoGen run ' + expected + ' ended with status ' + run.status + '. Inspect that run before starting another paid job.');\nif (run.status === 'succeeded') {\n  if (typeof run.downloadUrl !== 'string' || !run.downloadUrl.startsWith('https://')) throw new Error('Export completed without a valid HTTPS download URL. Retrieve the existing run instead of starting a new generation.');\n  return [{json: {...run, ready: true}}];\n}\nif (Date.now() >= $('Prepare request').first().json.pollDeadline) throw new Error('Polling timed out for ' + expected + '. The remote job may still be running. Retrieve this run before rerunning the workflow.');\nreturn [{json: {...run, ready: false}}];\n"
+      }
+    },
+    {
+      "id": "c4863d78-5692-5c6c-819a-63cb688a9604",
+      "name": "MP4 ready",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1440,
+        300
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "37b55093-4928-4157-9b0a-e9ea10adadbb",
+              "leftValue": "={{ $json.ready }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "481a342f-f8b1-5940-8c6a-ec112426a885",
+      "name": "Wait 5 seconds",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1440,
+        560
+      ],
+      "parameters": {
+        "resume": "timeInterval",
+        "amount": 5,
+        "unit": "seconds"
+      },
+      "webhookId": "364bc7e8-d748-4144-b0b7-99edd07788e4"
+    },
+    {
+      "id": "54f7bb7f-eaec-5d81-bca2-33a9b6417e28",
+      "name": "Download finished MP4",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1680,
+        300
+      ],
+      "parameters": {
+        "url": "={{ $json.downloadUrl }}",
+        "options": {
+          "timeout": 120000,
+          "response": {
+            "response": {
+              "responseFormat": "file",
+              "outputPropertyName": "data"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "81ee30a8-1ef6-528b-991e-46fdd3528192",
+      "name": "Setup and costs",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -430
+      ],
+      "parameters": {
+        "content": "## Convert an approved training deck to a narrated video with VideoGen\n\nConvert an uploaded PDF or PowerPoint training deck into narrated video, wait for the export, and download the MP4.\n\nUpload your PDF or PowerPoint through VideoGen first and wait until processing finishes. Put its `vg_file_...` ID in `fileId`. Replace `slideScripts` with one approved narration string per slide. Delete the entire `slideScripts` field to use embedded speaker notes instead. An empty array makes every slide silent; missing entries make the remaining slides silent. File upload is a prerequisite and is not performed by this template.\n\nRequires a paid VideoGen account and API credits. Create HTTP Header Auth credentials named Authorization with value Bearer YOUR_API_KEY, and select them on both authenticated HTTP nodes. No credentials are embedded.\n\nThe start request is never automatically retried. Polling stops on failure, cancellation, unknown status, or after 15 minutes. A timeout does not cancel the remote job. Reuse the saved workflowRunId when recovering.\n\nThe last node returns the MP4 as binary data. Connect Google Drive, S3, or another storage node for durable storage; signed API URLs expire.\n\nhttps://docs.videogen.io/\nhttps://videogen.io/",
+        "height": 660,
+        "width": 650
+      }
+    }
+  ],
+  "connections": {
+    "When clicking Execute workflow": {
+      "main": [
+        [
+          {
+            "node": "Approved input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Approved input": {
+      "main": [
+        [
+          {
+            "node": "Prepare request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare request": {
+      "main": [
+        [
+          {
+            "node": "Start VideoGen workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start VideoGen workflow": {
+      "main": [
+        [
+          {
+            "node": "Get VideoGen run",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get VideoGen run": {
+      "main": [
+        [
+          {
+            "node": "Check completion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check completion": {
+      "main": [
+        [
+          {
+            "node": "MP4 ready",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 5 seconds": {
+      "main": [
+        [
+          {
+            "node": "Get VideoGen run",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MP4 ready": {
+      "main": [
+        [
+          {
+            "node": "Download finished MP4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait 5 seconds",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": false
+  },
+  "active": false,
+  "pinData": {},
+  "tags": []
+}

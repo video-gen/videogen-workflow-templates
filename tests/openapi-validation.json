@@ -1,0 +1,20 @@
+[
+  {
+    "template": "approved-script-to-narrated-video.json",
+    "schema": "ScriptToVideoRequest",
+    "passed": true,
+    "errors": null
+  },
+  {
+    "template": "training-deck-to-narrated-video.json",
+    "schema": "SlideshowToVideoRequest",
+    "passed": true,
+    "errors": null
+  },
+  {
+    "template": "voiceover-to-captioned-video.json",
+    "schema": "VoiceoverToVideoRequest",
+    "passed": true,
+    "errors": null
+  }
+]

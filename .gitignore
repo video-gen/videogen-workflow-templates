@@ -1,0 +1,7 @@
+node_modules/
+fixture-tests/
+test-user/
+*.log
+.env
+.env.*
+__pycache__/
